@@ -303,19 +303,22 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      { -- If encountering errors, see telescope-fzf-native README for installation instructions
-        'nvim-telescope/telescope-fzf-native.nvim',
-
-        -- `build` is used to run some command when the plugin is installed/updated.
-        -- This is only run then, not every time Neovim starts up.
-        build = 'make',
-
-        -- `cond` is a condition used to determine whether this plugin should be
-        -- installed and loaded.
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
+      -- { -- If encountering errors, see telescope-fzf-native README for installation instructions
+      --   'nvim-telescope/telescope-fzf-native.nvim',
+      --
+      --   -- `build` is used to run some command when the plugin is installed/updated.
+      --   -- This is only run then, not every time Neovim starts up.
+      --   build = 'make',
+      --
+      --   -- `cond` is a condition used to determine whether this plugin should be
+      --   -- installed and loaded.
+      --   cond = function()
+      --     return vim.fn.executable 'make' == 1
+      --   end,
+      -- },
+      --
+      -- Use this for windows telescope config
+      {'nvim-telescope/telescope-fzf-native.nvim', build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' },
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
@@ -836,7 +839,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
