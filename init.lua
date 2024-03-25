@@ -84,6 +84,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+local function tabnine_build_path()
+  if vim.loop.os_uname().sysname == 'Windows_NT' then
+    return 'powershell.exe -file .\\dl_binaries.ps1' --'pwsh.exe -file .\\dl_binaries.ps1'
+  else
+    return './dl_binaries.sh'
+  end
+end
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -91,7 +99,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -854,6 +862,10 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   { import = 'custom.plugins' },
+
+  -- Enable TabNine for either unix/win?
+  -- Get platform dependant build script defined at start of file
+  { 'codota/tabnine-nvim', build = tabnine_build_path() },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -875,6 +887,17 @@ require('lazy').setup({
     },
   },
 })
+
+-- More tabnine thing things? activation
+require('tabnine').setup {
+  disable_auto_comment = true,
+  accept_keymap = '<Tab>',
+  dismiss_keymap = '<C-]>',
+  debounce_ms = 800,
+  suggestion_color = { gui = '#808080', cterm = 244 },
+  exclude_filetypes = { 'TelescopePrompt', 'NvimTree' },
+  log_file_path = nil, -- absolute path to Tabnine log file
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
