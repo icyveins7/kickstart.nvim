@@ -873,6 +873,17 @@ require('lazy').setup({
   -- Enable TabNine for either unix/win?
   -- Get platform dependant build script defined at start of file
   { 'codota/tabnine-nvim', build = tabnine_build_path() },
+
+  -- Enable trouble.nvim
+  {
+    'folke/trouble.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
