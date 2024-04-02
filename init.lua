@@ -884,6 +884,16 @@ require('lazy').setup({
       -- refer to the configuration section below
     },
   },
+
+  -- Enable floating signature help
+  {
+    'ray-x/lsp_signature.nvim',
+    event = 'VeryLazy',
+    opts = {},
+    config = function(_, opts)
+      require('lsp_signature').setup(opts)
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
