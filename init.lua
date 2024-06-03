@@ -898,6 +898,7 @@ require('lazy').setup({
   {
     'ray-x/lsp_signature.nvim',
     event = 'VeryLazy',
+    -- TODO: use move_cursor_key to set a reasonable button to switch to floating window
     opts = {},
     config = function(_, opts)
       require('lsp_signature').setup(opts)
