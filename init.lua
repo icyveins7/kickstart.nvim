@@ -898,8 +898,12 @@ require('lazy').setup({
   {
     'ray-x/lsp_signature.nvim',
     event = 'VeryLazy',
-    -- TODO: use move_cursor_key to set a reasonable button to switch to floating window
-    opts = {},
+    -- use move_cursor_key to set a reasonable button to switch to floating window
+    opts = {
+      move_cursor_key = '<C-B>', -- so we use Ctrl-B to switch between floating window and main
+      -- By default, the keymap to move up and down in floating window is
+      -- <C-o><C-u> or <C-o><C-d> i.e. with additional <C-o>
+    },
     config = function(_, opts)
       require('lsp_signature').setup(opts)
     end,
