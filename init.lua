@@ -919,6 +919,23 @@ require('lazy').setup({
     end,
     ft = { 'markdown' },
   },
+
+  -- Neogen for documentation generation
+  {
+    'danymat/neogen',
+    config = function()
+      require('neogen').setup {
+        enabled = true,
+        languages = {
+          python = {
+            template = {
+              annotation_convention = 'numpydoc',
+            },
+          },
+        },
+      }
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
