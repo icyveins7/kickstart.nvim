@@ -225,6 +225,14 @@ vim.filetype.add {
   },
 }
 
+-- Add shortcut to yank path of current buffer
+function insertFullPath()
+  local filepath = vim.fn.expand '%'
+  vim.fn.setreg('0', filepath) -- write to clipboard, specifically register 0
+end
+
+vim.keymap.set('n', '<leader>pc', insertFullPath, { noremap = true, silent = true, desc = '[P]ath [C]opy' })
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -307,6 +315,7 @@ require('lazy').setup({
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+        ['<leader>p'] = { name = '[P]ath', _ = 'which_key_ignore' },
       }
     end,
   },
