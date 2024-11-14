@@ -225,6 +225,28 @@ vim.filetype.add {
   },
 }
 
+-- Add function to get python environment
+local function which_python()
+  if vim.loop.os_uname().sysname == 'Windows_NT' then
+    -- For windows
+    local function getFirstWinWhere(str)
+      for line in str:gmatch '[^\r\n]+' do
+        return line
+      end
+    end
+    local f = io.popen('where python', 'r') or error "Fail to execute 'env which python'"
+    local s = f:read '*a' or error 'Fail to read from io.popen result'
+    f:close()
+    return getFirstWinWhere(s)
+  else
+    -- For linux
+    local f = io.popen('env which python', 'r') or error "Fail to execute 'env which python'"
+    local s = f:read '*a' or error 'Fail to read from io.popen result'
+    f:close()
+    return string.gsub(s, '%s+$', '')
+  end
+end
+
 -- Add shortcut to yank path of current buffer
 function insertFullPath()
   local filepath = vim.fn.expand '%'
@@ -575,12 +597,25 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- pylsp = {},
+        --
+        -- pylsp = {
+        --   pylsp = {
+        --     plugins = {
+        --       jedi = { environment = which_python() },
+        --       -- tried to disable this to make it faster but autocompletes are still very slow
+        --       -- mccabe = { enabled = false },
+        --       -- pyflakes = { enabled = false },
+        --     },
+        --   },
+        -- },
+        --
         -- black = {},
         -- cmake = {},
 
         -- gopls = {},
-        -- pyright = {},
+        --
+        -- pyright seems much faster than pylsp
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
