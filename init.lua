@@ -597,21 +597,25 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        pylsp = {
-          pylsp = {
-            plugins = {
-              jedi = { environment = which_python() },
-              -- tried to disable this to make it faster but autocompletes are still very slow
-              -- mccabe = { enabled = false },
-              -- pyflakes = { enabled = false },
-            },
-          },
-        },
+        --
+        -- pylsp = {
+        --   pylsp = {
+        --     plugins = {
+        --       jedi = { environment = which_python() },
+        --       -- tried to disable this to make it faster but autocompletes are still very slow
+        --       -- mccabe = { enabled = false },
+        --       -- pyflakes = { enabled = false },
+        --     },
+        --   },
+        -- },
+        --
         -- black = {},
         -- cmake = {},
 
         -- gopls = {},
-        -- pyright = {},
+        --
+        -- pyright seems much faster than pylsp
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
