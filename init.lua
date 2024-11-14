@@ -960,6 +960,14 @@ require('lazy').setup({
     },
     config = true,
   },
+
+  -- Enable csvview
+  {
+    'hat0uma/csvview.nvim',
+    config = function()
+      require('csvview').setup()
+    end,
+  },
 }, {
   concurrency = 1,
   ui = {
