@@ -96,7 +96,7 @@ end
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = ','
 
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
@@ -1024,6 +1024,30 @@ require('lazy').setup({
         zindex = 20, -- The Z-index of the context window
         on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
       }
+    end,
+  },
+
+  -- Enable vimtex for latex
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      -- See :h vimtex_view_sumatrapdf
+      if vim.loop.os_uname().sysname == 'Windows_NT' then
+        vim.g.vimtex_view_general_viewer = 'SumatraPDF'
+        -- from https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/
+        vim.g.vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
+
+        vim.g.vimtex_compiler_method = 'latexmk' -- this is default anyway
+        -- vim.g.vimtex_compiler_method = 'generic'
+        -- vim.g.vimtex_compiler_generic = {
+        --   command = 'llmk',
+        -- }
+      else
+        vim.g.vimtex_view_method = 'zathura'
+      end
     end,
   },
 }, {
