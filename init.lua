@@ -218,6 +218,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.tex',
+  callback = function()
+    vim.opt_local.conceallevel = 2
+  end,
+})
+
 -- Enable mdx recognition as markdown
 vim.filetype.add {
   extension = {
@@ -886,6 +893,7 @@ require('lazy').setup({
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
+        disable = { 'latex' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
@@ -1045,6 +1053,7 @@ require('lazy').setup({
         -- vim.g.vimtex_compiler_generic = {
         --   command = 'llmk',
         -- }
+        --
       else
         vim.g.vimtex_view_method = 'zathura'
       end
