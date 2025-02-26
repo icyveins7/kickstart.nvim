@@ -26,6 +26,8 @@ return {
   config = function()
     -- disable defaults
     vim.g.codeium_disable_bindings = 1
+
+    vim.g.codeium_idle_delay = 250 -- default was 500ms?
     -- Set ctrl-t to call codeium#Accept
     vim.keymap.set('i', '<C-t>', function()
       return vim.fn['codeium#Accept']()
