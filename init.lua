@@ -992,6 +992,7 @@ require('lazy').setup({
               annotation_convention = 'numpydoc',
             },
           },
+          cuda = require 'neogen.configurations.cpp',
         },
       }
     end,
