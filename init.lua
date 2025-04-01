@@ -975,6 +975,8 @@ require('lazy').setup({
     build = 'cd app && npx yarn install',
     init = function()
       vim.g.mkdp_filetypes = { 'markdown' }
+      vim.g.mkdp_open_to_the_world = 1
+      vim.g.mkdp_echo_preview_url = 1
     end,
     ft = { 'markdown' },
   },
@@ -1071,6 +1073,8 @@ require('lazy').setup({
   {
     'stevearc/oil.nvim',
     config = function()
+      vim.api.nvim_set_keymap('n', '<F2>', ':Oil<CR>', { noremap = true, silent = true })
+
       require('oil').setup {
 
         default_file_explorer = true,
