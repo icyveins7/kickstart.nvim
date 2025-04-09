@@ -271,6 +271,9 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- Add my additional commands
+require('scm') -- this is for SCM RTC
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
