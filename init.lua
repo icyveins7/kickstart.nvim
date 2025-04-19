@@ -272,7 +272,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- Add my additional commands
-require('scm') -- this is for SCM RTC
+require 'scm' -- this is for SCM RTC
 
 -- [[ Configure and install plugins ]]
 --
@@ -1121,7 +1121,8 @@ require('lazy').setup({
     end,
   },
 }, {
-  concurrency = 1,
+  -- if you comment out the concurrency param then it will just default to OS parallelism
+  -- concurrency = 1,
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
