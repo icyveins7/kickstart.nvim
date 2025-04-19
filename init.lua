@@ -96,7 +96,7 @@ end
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = ','
 
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
@@ -199,10 +199,10 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -218,12 +218,49 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.tex',
+  callback = function()
+    vim.opt_local.conceallevel = 2
+  end,
+})
+
 -- Enable mdx recognition as markdown
 vim.filetype.add {
   extension = {
     mdx = 'markdown',
   },
 }
+
+-- Add function to get python environment
+local function which_python()
+  if vim.loop.os_uname().sysname == 'Windows_NT' then
+    -- For windows
+    local function getFirstWinWhere(str)
+      for line in str:gmatch '[^\r\n]+' do
+        return line
+      end
+    end
+    local f = io.popen('where python', 'r') or error "Fail to execute 'env which python'"
+    local s = f:read '*a' or error 'Fail to read from io.popen result'
+    f:close()
+    return getFirstWinWhere(s)
+  else
+    -- For linux
+    local f = io.popen('env which python', 'r') or error "Fail to execute 'env which python'"
+    local s = f:read '*a' or error 'Fail to read from io.popen result'
+    f:close()
+    return string.gsub(s, '%s+$', '')
+  end
+end
+
+-- Add shortcut to yank path of current buffer
+function insertFullPath()
+  local filepath = vim.fn.expand '%'
+  vim.fn.setreg('0', filepath) -- write to clipboard, specifically register 0
+end
+
+vim.keymap.set('n', '<leader>pc', insertFullPath, { noremap = true, silent = true, desc = '[P]ath [C]opy' })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -233,6 +270,9 @@ if not vim.loop.fs_stat(lazypath) then
   vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
+
+-- Add my additional commands
+require('scm') -- this is for SCM RTC
 
 -- [[ Configure and install plugins ]]
 --
@@ -247,7 +287,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -300,13 +340,20 @@ require('lazy').setup({
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      -- Document existing key chains (updated for new which-key version)
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>c_', hidden = true },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>d_', hidden = true },
+        { '<leader>p', group = '[P]ath' },
+        { '<leader>p_', hidden = true },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>r_', hidden = true },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>s_', hidden = true },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>w_', hidden = true },
       }
     end,
   },
@@ -522,6 +569,7 @@ require('lazy').setup({
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
+          --  Use <C-w><C-w> to switch to the popup and then move as per normal inside it
           map('K', vim.lsp.buf.hover, 'Hover Documentation')
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
@@ -565,14 +613,27 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = {},
-        pylsp = {},
-        black = {},
-        cmake = {},
+        -- clangd = {},
+        --
+        -- pylsp = {
+        --   pylsp = {
+        --     plugins = {
+        --       jedi = { environment = which_python() },
+        --       -- tried to disable this to make it faster but autocompletes are still very slow
+        --       -- mccabe = { enabled = false },
+        --       -- pyflakes = { enabled = false },
+        --     },
+        --   },
+        -- },
+        --
+        -- black = {},
+        -- cmake = {},
 
         -- gopls = {},
-        -- pyright = {},
-        rust_analyzer = {},
+        --
+        -- pyright seems much faster than pylsp
+        pyright = {},
+        -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -582,20 +643,20 @@ require('lazy').setup({
         -- tsserver = {},
         --
 
-        lua_ls = {
-          -- cmd = {...},
-          -- filetypes = { ...},
-          -- capabilities = {},
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
-            },
-          },
-        },
+        -- lua_ls = {
+        --   -- cmd = {...},
+        --   -- filetypes = { ...},
+        --   -- capabilities = {},
+        --   settings = {
+        --     Lua = {
+        --       completion = {
+        --         callSnippet = 'Replace',
+        --       },
+        --       -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+        --       -- diagnostics = { disable = { 'missing-fields' } },
+        --     },
+        --   },
+        -- },
       }
 
       -- Ensure the servers and tools above are installed
@@ -637,7 +698,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, matlab = true }
         return {
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
@@ -675,12 +736,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -828,7 +889,7 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-  { -- Highlight, edit, and navigate code
+  { -- Highlight, edit, and navigate code (NOTE: this can only be enabled when you have a compiler)
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
@@ -841,6 +902,7 @@ require('lazy').setup({
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
+        disable = { 'latex' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
@@ -881,7 +943,7 @@ require('lazy').setup({
 
   -- Enable TabNine for either unix/win?
   -- Get platform dependant build script defined at start of file
-  { 'codota/tabnine-nvim', build = tabnine_build_path() },
+  -- { 'codota/tabnine-nvim', build = tabnine_build_path() },
 
   -- Enable trouble.nvim
   {
@@ -916,13 +978,16 @@ require('lazy').setup({
     build = 'cd app && npx yarn install',
     init = function()
       vim.g.mkdp_filetypes = { 'markdown' }
+      vim.g.mkdp_open_to_the_world = 1
+      vim.g.mkdp_echo_preview_url = 1
     end,
     ft = { 'markdown' },
   },
 
-  -- Neogen for documentation generation
+  -- Enable doc generator
   {
     'danymat/neogen',
+    version = '*',
     config = function()
       require('neogen').setup {
         enabled = true,
@@ -932,11 +997,131 @@ require('lazy').setup({
               annotation_convention = 'numpydoc',
             },
           },
+          cuda = require 'neogen.configurations.cpp',
+        },
+      }
+    end,
+  },
+
+  -- Enable neogit for git?
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', --required
+      'sindrets/diffview.nvim', --optional -diff integration
+      -- Only one of these is needed
+      'nvim-telescope/telescope.nvim', -- optional
+      -- "ibhagwan/fzf-lua", --optional
+      -- "echasnovski/mini.pick", --optional
+    },
+    config = true,
+  },
+
+  -- Enable csvview
+  {
+    'hat0uma/csvview.nvim',
+    config = function()
+      require('csvview').setup()
+    end,
+  },
+
+  -- Enable treesitter-context
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require('treesitter-context').setup {
+        enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+        multiwindow = false, -- Enable multiwindow support.
+        max_lines = 5, -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 20, -- Maximum number of lines to show for a single context
+        trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = 'cursor', -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20, -- The Z-index of the context window
+        on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+      }
+    end,
+  },
+
+  -- Enable vimtex for latex
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      -- See :h vimtex_view_sumatrapdf
+      if vim.loop.os_uname().sysname == 'Windows_NT' then
+        vim.g.vimtex_view_general_viewer = 'SumatraPDF'
+        -- from https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/
+        vim.g.vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
+
+        vim.g.vimtex_compiler_method = 'latexmk' -- this is default anyway
+        -- vim.g.vimtex_compiler_method = 'generic'
+        -- vim.g.vimtex_compiler_generic = {
+        --   command = 'llmk',
+        -- }
+        --
+      else
+        vim.g.vimtex_view_method = 'zathura'
+      end
+    end,
+  },
+
+  -- oil.nvim
+  {
+    'stevearc/oil.nvim',
+    config = function()
+      vim.api.nvim_set_keymap('n', '<F2>', ':Oil<CR>', { noremap = true, silent = true })
+
+      require('oil').setup {
+
+        default_file_explorer = true,
+        columns = {
+          'icon',
+          -- "permissions",
+          'size',
+          'mtime',
+        },
+
+        -- Keymaps in oil buffer. Can be any value that `vim.keymap.set` accepts OR a table of keymap
+        -- options with a `callback` (e.g. { callback = function() ... end, desc = "", mode = "n" })
+        -- Additionally, if it is a string that matches "actions.<name>",
+        -- it will use the mapping at require("oil.actions").<name>
+        -- Set to `false` to remove a keymap
+        -- See :help oil-actions for a list of all available actions
+        keymaps = {
+          ['g?'] = { 'actions.show_help', mode = 'n' },
+          ['<CR>'] = 'actions.select',
+          ['<C-s>'] = { 'actions.select', opts = { vertical = true } },
+          ['<C-h>'] = { 'actions.select', opts = { horizontal = true } },
+          ['<C-t>'] = { 'actions.select', opts = { tab = true } },
+          ['<C-p>'] = 'actions.preview',
+          ['<C-c>'] = { 'actions.close', mode = 'n' },
+          ['<C-l>'] = 'actions.refresh',
+          ['-'] = { 'actions.parent', mode = 'n' },
+          ['_'] = { 'actions.open_cwd', mode = 'n' },
+          ['`'] = { 'actions.cd', mode = 'n' },
+          ['~'] = { 'actions.cd', opts = { scope = 'tab' }, mode = 'n' },
+          ['gs'] = { 'actions.change_sort', mode = 'n' },
+          ['gx'] = 'actions.open_external',
+          ['g.'] = { 'actions.toggle_hidden', mode = 'n' },
+          ['g\\'] = { 'actions.toggle_trash', mode = 'n' },
+        },
+        -- Above are defaults, but leaving this here
+        use_default_keymaps = true,
+        view_options = {
+          show_hidden = true,
         },
       }
     end,
   },
 }, {
+  concurrency = 1,
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
@@ -959,15 +1144,15 @@ require('lazy').setup({
 })
 
 -- More tabnine thing things? activation
-require('tabnine').setup {
-  disable_auto_comment = true,
-  accept_keymap = '<C-t>',
-  dismiss_keymap = '<C-]>',
-  debounce_ms = 800,
-  suggestion_color = { gui = '#808080', cterm = 244 },
-  exclude_filetypes = { 'TelescopePrompt', 'NvimTree' },
-  log_file_path = nil, -- absolute path to Tabnine log file
-}
-
+-- require('tabnine').setup {
+--   disable_auto_comment = true,
+--   accept_keymap = '<C-t>',
+--   dismiss_keymap = '<C-]>',
+--   debounce_ms = 800,
+--   suggestion_color = { gui = '#808080', cterm = 244 },
+--   exclude_filetypes = { 'TelescopePrompt', 'NvimTree' },
+--   log_file_path = nil, -- absolute path to Tabnine log file
+-- }
+--
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
