@@ -1120,6 +1120,18 @@ require('lazy').setup({
       }
     end,
   },
+
+  -- indent-blankline
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    ---@module "ibl"
+    ---@type ibl.config
+    opts = {},
+    config = function()
+      require('ibl').setup()
+    end,
+  },
 }, {
   -- if you comment out the concurrency param then it will just default to OS parallelism
   -- concurrency = 1,
