@@ -1129,7 +1129,12 @@ require('lazy').setup({
     ---@type ibl.config
     opts = {},
     config = function()
-      require('ibl').setup()
+      require('ibl').setup {
+        scope = {
+          show_start = false, -- the underline is very annoying
+          show_end = false, -- the underline is very annoying
+        },
+      }
     end,
   },
 
