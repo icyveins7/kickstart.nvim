@@ -1134,7 +1134,7 @@ require('lazy').setup({
   },
 }, {
   -- if you comment out the concurrency param then it will just default to OS parallelism
-  -- concurrency = 1,
+  concurrency = 4, -- it seems like github is blocking too many concurrent connections anyway, so let's just limit it
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
