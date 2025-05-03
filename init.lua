@@ -1132,6 +1132,20 @@ require('lazy').setup({
       require('ibl').setup()
     end,
   },
+
+  -- supermaven
+  {
+    'supermaven-inc/supermaven-nvim',
+    config = function()
+      require('supermaven-nvim').setup {
+        keymaps = {
+          accept_suggestion = '<C-t>', -- default is tab
+          clear_suggestion = '<C-]>', -- this is default
+          accept_word = '<C-j>', -- this is also default
+        },
+      }
+    end,
+  },
 }, {
   -- if you comment out the concurrency param then it will just default to OS parallelism
   concurrency = 4, -- it seems like github is blocking too many concurrent connections anyway, so let's just limit it
