@@ -1175,6 +1175,44 @@ require('lazy').setup({
   },
 })
 
+-- I copied this from chatgpt, just to see the startup time quickly
+
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'LazyVimStarted', -- or "VeryLazy" if you're not using LazyVim
+  callback = function()
+    local stats = require('lazy').stats()
+    local message = string.format('󰄛 Started up in %.2f ms', stats.count, stats.startuptime)
+
+    -- Create a small buffer
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { message })
+
+    -- Window dimensions
+    local width = #message + 4
+    local height = 1
+
+    -- Position it top-right
+    local opts = {
+      style = 'minimal',
+      relative = 'editor',
+      width = width,
+      height = height,
+      row = 1,
+      col = vim.o.columns - width - 1,
+      border = 'rounded',
+    }
+
+    local win = vim.api.nvim_open_win(buf, false, opts)
+
+    -- Close the popup automatically after 3 seconds
+    vim.defer_fn(function()
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
+    end, 3000)
+  end,
+})
+
 -- More tabnine thing things? activation
 -- require('tabnine').setup {
 --   disable_auto_comment = true,
