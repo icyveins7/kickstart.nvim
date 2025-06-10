@@ -15,7 +15,7 @@ return {
   --
   -- This doesn't seem to work. Just use the .vim one below
 
-  'Exafunction/codeium.vim',
+  'Exafunction/windsurf.vim',
   event = 'BufEnter',
   dependencies = {
     'nvim-lua/plenary.nvim',
@@ -41,7 +41,7 @@ return {
       return vim.fn['codeium#AcceptNextLine']()
     end, { expr = true, silent = true })
 
-    -- vim.g.codeium_log_file = '~/codeium.log'
+    vim.g.codeium_log_file = '~/codeium.log'
 
     vim.g.codeium_server_config = {
       portal_url = vim.fn.getenv 'CODEIUM_PORTAL_URL',
