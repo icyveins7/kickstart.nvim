@@ -272,7 +272,8 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- Add my additional commands
-require('scm') -- this is for SCM RTC
+require 'scm' -- this is for SCM RTC
+require 'lineate_inputs'
 
 -- [[ Configure and install plugins ]]
 --
