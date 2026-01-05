@@ -594,6 +594,8 @@ require('lazy').setup({
               callback = vim.lsp.buf.clear_references,
             })
           end
+
+          vim.lsp.set_log_level 'off'
         end,
       })
 
