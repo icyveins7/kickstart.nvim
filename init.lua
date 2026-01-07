@@ -369,7 +369,6 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
       -- { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -594,6 +593,8 @@ require('lazy').setup({
               callback = vim.lsp.buf.clear_references,
             })
           end
+
+          vim.lsp.set_log_level 'off'
         end,
       })
 
@@ -892,6 +893,8 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code (NOTE: this can only be enabled when you have a compiler)
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main', -- they switched to main from master now
+    lazy = false,
     build = ':TSUpdate',
     opts = {
       ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
@@ -911,7 +914,7 @@ require('lazy').setup({
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
+      require('nvim-treesitter.config').setup(opts) -- after switching to the newer 'main' branch, it's 'config' not 'configs'
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
