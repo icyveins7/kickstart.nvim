@@ -914,7 +914,7 @@ require('lazy').setup({
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.config').setup(opts) -- after switching to the newer 'main' branch, it's 'config' not 'configs'
+      require('nvim-treesitter').setup(opts) -- after switching to the newer 'main' branch, remove the .config part
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
