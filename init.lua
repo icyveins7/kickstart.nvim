@@ -369,7 +369,6 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
       -- { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -594,6 +593,8 @@ require('lazy').setup({
               callback = vim.lsp.buf.clear_references,
             })
           end
+
+          vim.lsp.set_log_level 'off'
         end,
       })
 
@@ -892,26 +893,28 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code (NOTE: this can only be enabled when you have a compiler)
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main', -- they switched to main from master now
+    lazy = false,
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-        disable = { 'latex' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
+      -- ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+      -- -- Autoinstall languages that are not installed
+      -- auto_install = true,
+      -- highlight = {
+      --   enable = true,
+      --   -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+      --   --  If you are experiencing weird indenting issues, add the language to
+      --   --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+      --   additional_vim_regex_highlighting = { 'ruby' },
+      --   disable = { 'latex' },
+      -- },
+      -- indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
+      require('nvim-treesitter').setup(opts) -- after switching to the newer 'main' branch, remove the .config part
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -919,6 +922,7 @@ require('lazy').setup({
       --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      --
     end,
   },
 
@@ -1175,3 +1179,18 @@ require('lazy').setup({
 --
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+
+-- New treesitter rewrite configuration is outside of lazy.nvim
+-- enable highlighting with the new method
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { '*' },
+  callback = function(args)
+    -- this will just silently eat errors for files that don't have a parser
+    -- which includes things like the oil.nvim, terminals, etc.
+    pcall(vim.treesitter.start)
+  end,
+})
+
+-- enable indenting with the new method
+vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"

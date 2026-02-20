@@ -41,12 +41,12 @@ return {
       return vim.fn['codeium#AcceptNextLine']()
     end, { expr = true, silent = true })
 
-    vim.g.codeium_log_file = '~/codeium.log'
+    -- vim.g.codeium_log_file = '~/codeium.log'
 
-    vim.g.codeium_server_config = {
-      portal_url = vim.fn.getenv 'CODEIUM_PORTAL_URL',
-      api_url = vim.fn.getenv 'CODEIUM_API_URL',
-    }
+    -- vim.g.codeium_server_config = {
+    --   portal_url = vim.fn.getenv 'CODEIUM_PORTAL_URL',
+    --   api_url = vim.fn.getenv 'CODEIUM_API_URL',
+    -- }
   end,
 
   -- {
