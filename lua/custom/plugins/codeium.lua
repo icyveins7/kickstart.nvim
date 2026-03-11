@@ -22,6 +22,16 @@ return {
     'hrsh7th/nvim-cmp',
   },
   -- commit = '289eb724e5d6fab2263e94a1ad6e54afebefafb2',
+  --
+  --
+  -- The commit/version doesn't matter any more, it seems like in general
+  -- the language_server exe/tar.gz doesn't even download properly any more on Windows
+  -- What is working now for Windows is to use VSCode to install the extension,
+  -- then go to .vscode/extensions/codeium.codeium-1.48.2/dist
+  -- The hash there may not match the hash in .codeium/bin, but just copy the language_server exe
+  -- E.g. .vscode/..../dist/e03af6ebc.../language_server_windows_x64.exe -> .codeium/bin/37f12b83df38.../
+  --
+  --
   -- version = '1.8.37', -- seems like newer versions are bugged for now
   config = function()
     -- disable defaults
