@@ -989,14 +989,20 @@ require('lazy').setup({
   --   ft = { 'markdown' },
   -- },
   {
-    'selimacerbas/markdown-preview.nvim',
-    dependencies = { 'selimacerbas/live-server.nvim' },
+    'icyveins7/markdown-preview.nvim',
+    dependencies = { 'icyveins7/live-server.nvim' },
     config = function()
       require('markdown_preview').setup {
         -- all optional; sane defaults shown
+        host = '0.0.0.0',
         port = 8421,
-        open_browser = true,
+        open_browser = false,
         debounce_ms = 300,
+        hooks = {
+          on_start = function(url)
+            vim.notify('Markdown Preview: ' .. url, vim.log.levels.INFO)
+          end,
+        },
       }
     end,
   },
