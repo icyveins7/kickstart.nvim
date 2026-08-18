@@ -594,7 +594,7 @@ require('lazy').setup({
             })
           end
 
-          vim.lsp.set_log_level 'off'
+          vim.lsp.log.set_level 'debug'
         end,
       })
 
@@ -977,20 +977,9 @@ require('lazy').setup({
   },
 
   -- Enable markdown preview
-  -- {
-  --   'iamcco/markdown-preview.nvim',
-  --   cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
-  --   build = 'cd app && npx yarn install',
-  --   init = function()
-  --     vim.g.mkdp_filetypes = { 'markdown' }
-  --     vim.g.mkdp_open_to_the_world = 1
-  --     vim.g.mkdp_echo_preview_url = 1
-  --   end,
-  --   ft = { 'markdown' },
-  -- },
   {
-    'icyveins7/markdown-preview.nvim',
-    dependencies = { 'icyveins7/live-server.nvim' },
+    'selimacerbas/markdown-preview.nvim',
+    dependencies = { 'selimacerbas/live-server.nvim' },
     config = function()
       require('markdown_preview').setup {
         -- all optional; sane defaults shown
